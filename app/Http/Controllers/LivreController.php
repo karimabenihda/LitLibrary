@@ -8,10 +8,19 @@ use App\Models\Category;
 
 class LivreController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $livres = Livre::all();
-        return view('livres.index', compact('livres'));
+        $livres = Livre::query();
+        if($request->has('category')&& $request->category!=''){
+            $livres->where('category_id',$request->category);
+        }
+        $livres=$livres->get();
+
+        $categories=Category::all();
+        if($request->ajax()){
+            return response()->json(view('livres.table',compact('livres'))->render());
+        }
+        return view('livres.index', compact('livres','categories'));
     }
 
     public function create()
